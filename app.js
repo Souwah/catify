@@ -248,8 +248,20 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   return arr.sort(() => Math.random() - 0.5);
 }
 
-const seedGenres = shuffle(genres).slice(0, 5).join(',');
-console.log('🎯 Final seed genres:', seedGenres);
+// ✅ Shuffle and limit to 5 genres
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+const shuffled = shuffle(genres);
+const seedGenres = shuffled.slice(0, 5).join(',');
+
+console.log('🎯 Final genre list for Spotify:', shuffled);
+console.log('✅ Sending to Spotify:', seedGenres);
+if (!seedGenres || seedGenres.split(',').length > 5) {
+  throw new Error('❌ Invalid seedGenres: too many or empty');
+}
+
 
   const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${seedGenres}`, {
     headers: {
