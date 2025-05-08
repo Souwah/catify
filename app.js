@@ -244,7 +244,13 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   const playlistId = playlistData.id;
 
   // Step 2: Fetch recommended tracks
-  const seedGenres = genres.length ? genres.slice(0, 5).join(',') : 'pop';
+  function shuffle(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+const seedGenres = shuffle(genres).slice(0, 5).join(',');
+console.log('🎯 Final seed genres:', seedGenres);
+
   const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${seedGenres}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`
