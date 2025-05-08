@@ -44,8 +44,8 @@ document.getElementById('spotifyLoginBtn').addEventListener('click', async () =>
     const data = await res.json();
     window.location.href = data.url;
   } catch (err) {
-    console.error('Failed to get Spotify login URL:', err);
-    alert('Unable to redirect to Spotify. Try again later.');
+    console.error('Failed to fetch Spotify login URL:', err);
+    alert('Something went wrong while logging in with Spotify.');
   }
 });
 
