@@ -157,6 +157,13 @@ async function loadCatBreeds() {
   }
 }
 
+document.getElementById('spotifyLogoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('spotify_auth_code');
+  localStorage.removeItem('spotify_access_token');
+  alert('Logged out (debug mode). Refreshing...');
+  window.location.reload();
+});
+
 async function renderBreeds(breeds) {
   grid.innerHTML = '';
   for (const breed of breeds.slice(0, 30)) {
