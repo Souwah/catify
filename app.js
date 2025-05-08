@@ -85,7 +85,11 @@ document.getElementById('catifyBtn').addEventListener('click', async () => {
 
   try {
     const { tracks, playlistUrl } = await createSpotifyPlaylistAndAddTracks(genres, accessToken);
-
+    console.log('Selected genres:', genres);
+    if (!genres || genres.length === 0) {
+      alert('No genres found based on selected cat temperament.');
+      return;
+    }
     const playlist = document.getElementById('playlist');
     playlist.innerHTML = '';
 
@@ -238,14 +242,24 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   const playlistId = playlistData.id;
 
   // Step 2: Fetch recommended tracks
-  const seedGenres = genres.slice(0, 5).join(',');
+  const seedGenres = genres.length ? genres.slice(0, 5).join(',') : 'pop';
   const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${seedGenres}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   });
 
-  const recData = await recRes.json();
+  let recData;
+try {
+  recData = await recRes.json();
+} catch (err) {
+  console.error('Invalid JSON from recommendations API:', err);
+  return {
+    tracks: [],
+    playlistUrl: playlistData.external_urls.spotify
+  };
+}
+
   const trackUris = recData.tracks.map(track => track.uri);
 
   // Step 3: Add tracks to playlist
