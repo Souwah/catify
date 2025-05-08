@@ -93,7 +93,17 @@ document.getElementById('catifyBtn').addEventListener('click', async () => {
     playlistLink.textContent = '🎵 Open this playlist in Spotify';
     playlistLink.target = '_blank';
     playlistLink.className = 'playlist-link';
-    playlist.appendChild(playlistLink);
+    const embed = document.createElement('iframe');
+    embed.src = `https://open.spotify.com/embed/playlist/${playlistUrl.split('/playlist/')[1]}?utm_source=generator`;
+    embed.width = '100%';
+    embed.height = '152';
+    embed.frameBorder = '0';
+    embed.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    embed.loading = 'lazy';
+    embed.style.marginTop = '20px';
+
+    playlist.appendChild(embed);
+
 
     tracks.forEach(track => {
       const div = document.createElement('div');
@@ -225,10 +235,14 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: 'Catify Playlist 🐾',
-      description: 'A playlist based on your cat\'s vibe',
+      name: `Catify: ${selectedBreeds.map(id => {
+        const breed = allBreeds.find(b => b.id === id);
+         return breed?.name || 'Unknown';
+       }).join(', ')}`,
+      description: `Made from these cat vibes: ${genres.join(', ')}`,
       public: false
-    })
+      })
+
   });
 
   const playlistData = await createRes.json();

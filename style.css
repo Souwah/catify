@@ -268,3 +268,7 @@ body {
 .debug-btn:hover {
   background-color: #555;
 }
+
+.playlist iframe {
+  border-radius: 12px;
+}
