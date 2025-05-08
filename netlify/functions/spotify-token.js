@@ -1,7 +1,7 @@
 export async function handler(event, context) {
   const client_id = process.env.SPOTIFY_CLIENT_ID;
   const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-  const redirect_uri = 'https://catify-playlist.netlify.app/callback.html';
+  const redirect_uri = 'https://catifybeta.netlify.app/callback.html';
 
   const code = event.queryStringParameters.code;
   if (!code) {
