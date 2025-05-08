@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catify Playlist</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="page-landing" class="page landing-page active">
+    <h1>Make a Playlist based on your CAT!</h1>
+    <button id="startBtn">Choose Your Cat</button>
+    <button id="spotifyLoginBtn">Login with Spotify</button>
+    <p class="spotify-info">
+      Make sure you login to Spotify first.
+    </p>
+    
+  </div>
+  <!-- Cat Breed Selection Page -->
+  <div id="page-select" class="page select-page">
+    <h2>Select a Cat Breed</h2>
+    <input 
+      type="text" 
+      id="breedSearch" 
+      placeholder="Search for a breed..." 
+      class="search-box"
+    />
+    <div class="scroll-wrapper">
+      <div id="breedGrid" class="grid"></div>
+    </div>
+    <button id="backBtn">← Back</button>
+    <button id="catifyBtn">Catify!</button>
+  </div>
+  <!-- Spotify Playlist Result Page -->
+  <div id="page-result" class="page result-page">
+    <h2>Your Catify Playlist</h2>
+    <div id="playlist" class="playlist-list"></div>
+    <button id="backToSelectBtn">← Back</button>
+  </div>
+
+
+  <div id="spotifyModal" class="modal">
+    <div class="modal-content">
+      <h3>Spotify Login Required</h3>
+      <p>You need to log in with Spotify to create your playlist.</p>
+      <div class="modal-actions">
+        <button id="modalLoginBtn">Log in with Spotify</button>
+        <button id="modalCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

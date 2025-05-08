@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify Redirect</title>
+</head>
+<body>
+  <p>Logging you in with Spotify...</p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+
+    if (!code) {
+      document.body.innerHTML = '<p>Authorization failed or canceled.</p>';
+    } else {
+      // Save code locally or send to your backend if using one
+      localStorage.setItem('spotify_auth_code', code);
+
+      // Go back to your main app
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
