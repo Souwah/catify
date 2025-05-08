@@ -8,18 +8,29 @@
   <p>Logging you in with Spotify...</p>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
 
-    if (!code) {
-      document.body.innerHTML = '<p>Authorization failed or canceled.</p>';
-    } else {
-      // Save code locally or send to your backend if using one
-      localStorage.setItem('spotify_auth_code', code);
-
-      // Go back to your main app
-      window.location.href = '/';
-    }
-  </script>
+  if (!code) {
+    document.body.innerHTML = 'Authorization failed or canceled.';
+  } else {
+    fetch(`/.netlify/functions/spotify-token?code=${code}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.access_token) {
+          localStorage.setItem('spotify_auth_code', code);
+          localStorage.setItem('spotify_access_token', data.access_token);
+          window.location.href = '/';
+        } else {
+          document.body.innerHTML = 'Token missing. Check Netlify function.';
+          console.error('No token returned:', data);
+        }
+      })
+      .catch(err => {
+        console.error('Token fetch error:', err);
+        document.body.innerHTML = 'Failed to exchange token.';
+      });
+  }
+</script>
 </body>
 </html>
