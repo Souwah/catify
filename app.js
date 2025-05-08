@@ -1,7 +1,7 @@
 // Core config
 const CAT_API_KEY = 'live_smy5GZEvB3sDjB90j9kmO8A50TSakrJNJ5ANGVyBn3TnFn2xRQftMcMv6y2ghtxJ';
 const CLIENT_ID = '979f4e20eb674b26a9eb25dbb8f88d72';
-const REDIRECT_URI = 'https://catify-playlist.netlify.app/callback.html';
+const REDIRECT_URI = 'https://catifybeta.netlify.app/callback.html';
 
 const grid = document.getElementById('breedGrid');
 const searchInput = document.getElementById('breedSearch');
