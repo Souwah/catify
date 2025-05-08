@@ -1,8 +1,4 @@
 // Core config
-const CAT_API_KEY = 'live_smy5GZEvB3sDjB90j9kmO8A50TSakrJNJ5ANGVyBn3TnFn2xRQftMcMv6y2ghtxJ';
-const CLIENT_ID = '979f4e20eb674b26a9eb25dbb8f88d72';
-const REDIRECT_URI = 'https://catifybeta.netlify.app/callback.html';
-
 const grid = document.getElementById('breedGrid');
 const searchInput = document.getElementById('breedSearch');
 
@@ -42,9 +38,15 @@ function getSpotifyLoginURL() {
   return `${SPOTIFY_AUTH_URL}?response_type=code&client_id=${encodeURIComponent(CLIENT_ID)}&scope=${encodeURIComponent(scopeParam)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
 }
 
-document.getElementById('spotifyLoginBtn').addEventListener('click', () => {
-  const url = getSpotifyLoginURL();
-  window.location.href = url;
+document.getElementById('spotifyLoginBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/.netlify/functions/get-login-url');
+    const data = await res.json();
+    window.location.href = data.url;
+  } catch (err) {
+    console.error('Failed to get Spotify login URL:', err);
+    alert('Unable to redirect to Spotify. Try again later.');
+  }
 });
 
 document.getElementById('startBtn').addEventListener('click', () => {
@@ -145,9 +147,7 @@ window.addEventListener('DOMContentLoaded', () => {
 async function loadCatBreeds() {
   grid.innerHTML = '<p>Loading breeds...</p>';
   try {
-    const res = await fetch('https://api.thecatapi.com/v1/breeds', {
-      headers: { 'x-api-key': CAT_API_KEY }
-    });
+    const res = await fetch('/.netlify/functions/get-cat-breeds');
     const breeds = await res.json();
     allBreeds = breeds.filter(b => b.id);
     renderBreeds(allBreeds);
@@ -167,9 +167,7 @@ async function renderBreeds(breeds) {
     img.alt = breed.name;
 
     try {
-      const imgRes = await fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${breed.id}&limit=1`, {
-        headers: { 'x-api-key': CAT_API_KEY }
-      });
+      const imgRes = await fetch(`/.netlify/functions/get-cat-image?breed_id=${breed.id}`);
       const imgData = await imgRes.json();
       img.src = imgData[0]?.url || '';
     } catch {
@@ -261,3 +259,5 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   };
   
 }
+
+
