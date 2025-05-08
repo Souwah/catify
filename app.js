@@ -254,7 +254,7 @@ function shuffle(array) {
 }
 
 const shuffled = shuffle(genres);
-const seedGenres = shuffled.slice(0, 5).join(',');
+const seedGenres = shuffled.slice(0, 4).join(',');
 
 console.log('🎯 Final genre list for Spotify:', shuffled);
 console.log('✅ Sending to Spotify:', seedGenres);
