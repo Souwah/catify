@@ -22,7 +22,7 @@ const temperamentToGenres = {
   Loyal: ['acoustic', 'folk'],
   Energetic: ['electronic', 'rock'],
   Bold: ['rock', 'punk'],
-  Shy: ['study', 'lo-fi', 'rainy-day'] // lo-fi not valid, so use 'study' + mood genres
+  Shy: ['study', 'rainy-day']
 };
 
 let allBreeds = [];
@@ -31,11 +31,6 @@ let selectedBreeds = [];
 function showPage(id) {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-}
-
-function getSpotifyLoginURL() {
-  const scopeParam = SCOPES.join(' ');
-  return `${SPOTIFY_AUTH_URL}?response_type=code&client_id=${encodeURIComponent(CLIENT_ID)}&scope=${encodeURIComponent(scopeParam)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
 }
 
 document.getElementById('spotifyLoginBtn').addEventListener('click', async () => {
@@ -93,7 +88,6 @@ document.getElementById('catifyBtn').addEventListener('click', async () => {
     const playlist = document.getElementById('playlist');
     playlist.innerHTML = '';
 
-    // 👇 Add the Spotify link at the top
     const playlistLink = document.createElement('a');
     playlistLink.href = playlistUrl;
     playlistLink.textContent = '🎵 Open this playlist in Spotify';
@@ -101,7 +95,6 @@ document.getElementById('catifyBtn').addEventListener('click', async () => {
     playlistLink.className = 'playlist-link';
     playlist.appendChild(playlistLink);
 
-    // 👇 Render each track visually
     tracks.forEach(track => {
       const div = document.createElement('div');
       div.className = 'track';
@@ -127,7 +120,6 @@ document.getElementById('catifyBtn').addEventListener('click', async () => {
   }
 });
 
-
 searchInput.addEventListener('input', () => {
   const term = searchInput.value.toLowerCase();
   const filtered = allBreeds.filter(b => b.name.toLowerCase().includes(term));
@@ -148,6 +140,13 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.getElementById('spotifyLogoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('spotify_auth_code');
+  localStorage.removeItem('spotify_access_token');
+  alert('Logged out (debug mode). Refreshing...');
+  window.location.reload();
+});
+
 async function loadCatBreeds() {
   grid.innerHTML = '<p>Loading breeds...</p>';
   try {
@@ -160,13 +159,6 @@ async function loadCatBreeds() {
     grid.innerHTML = '<p>Something went wrong. Check the console.</p>';
   }
 }
-
-document.getElementById('spotifyLogoutBtn').addEventListener('click', () => {
-  localStorage.removeItem('spotify_auth_code');
-  localStorage.removeItem('spotify_access_token');
-  alert('Logged out (debug mode). Refreshing...');
-  window.location.reload();
-});
 
 async function renderBreeds(breeds) {
   grid.innerHTML = '';
@@ -208,7 +200,7 @@ function getGenresFromSelectedBreeds() {
     if (breed.temperament) {
       breed.temperament.split(',').map(t => t.trim()).forEach(trait => {
         if (temperamentToGenres[trait]) {
-            temperamentToGenres[trait].forEach(genre => traits.add(genre));
+          temperamentToGenres[trait].forEach(genre => traits.add(genre));
         }
       });
     }
@@ -226,7 +218,6 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   const userData = await userRes.json();
   const userId = userData.id;
 
-  // Step 1: Create a playlist
   const createRes = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
     method: 'POST',
     headers: {
@@ -243,47 +234,51 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   const playlistData = await createRes.json();
   const playlistId = playlistData.id;
 
-  // Step 2: Fetch recommended tracks
-  function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
-}
+  function shuffle(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+  }
 
-// ✅ Shuffle and limit to 5 genres
-function shuffle(array) {
-  return [...array].sort(() => Math.random() - 0.5);
-}
+  const shuffled = shuffle(genres);
+  const seedGenres = shuffled.slice(0, 5).join(',');
 
-const shuffled = shuffle(genres);
-const seedGenres = shuffled.slice(0, 5).join(',');
+  console.log('🎯 Final genre list for Spotify:', shuffled);
+  console.log('✅ Sending to Spotify:', seedGenres);
 
-console.log('🎯 Final genre list for Spotify:', shuffled);
-console.log('✅ Sending to Spotify:', seedGenres);
-console.log('📥 Tracks to add:', trackUris);
-if (!seedGenres || seedGenres.split(',').length > 5) {
-  throw new Error('❌ Invalid seedGenres: too many or empty');
-}
+  if (!seedGenres || seedGenres.split(',').length > 5) {
+    throw new Error('❌ Invalid seedGenres: too many or empty');
+  }
 
-
-  const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${seedGenres}`, {
+  const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${encodeURIComponent(seedGenres)}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   });
 
   let recData;
-try {
-  recData = await recRes.json();
-} catch (err) {
-  console.error('Invalid JSON from recommendations API:', err);
-  return {
-    tracks: [],
-    playlistUrl: playlistData.external_urls.spotify
-  };
-}
+  try {
+    recData = await recRes.json();
+  } catch (err) {
+    console.error('Invalid JSON from recommendations API:', err);
+    return {
+      tracks: [],
+      playlistUrl: playlistData.external_urls.spotify
+    };
+  }
 
-  const trackUris = recData.tracks.map(track => track.uri);
+  if (!recData.tracks || recData.tracks.length === 0) {
+    console.warn('No tracks returned from Spotify.');
+    return {
+      tracks: [],
+      playlistUrl: playlistData.external_urls.spotify
+    };
+  }
 
-  // Step 3: Add tracks to playlist
+  const trackUris = recData.tracks
+    .map(track => track.uri)
+    .filter(uri => uri && uri.startsWith('spotify:track:'));
+
+  console.log('🎶 Adding tracks to playlist:', trackUris);
+
   await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
     method: 'POST',
     headers: {
@@ -299,7 +294,4 @@ try {
     tracks: recData.tracks,
     playlistUrl: playlistData.external_urls.spotify
   };
-  
 }
-
-
