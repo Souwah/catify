@@ -234,50 +234,38 @@ async function createSpotifyPlaylistAndAddTracks(genres, accessToken) {
   const playlistData = await createRes.json();
   const playlistId = playlistData.id;
 
-  function shuffle(array) {
-    return [...array].sort(() => Math.random() - 0.5);
-  }
+// Step 2: Search for tracks by genre instead of recommendations
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
 
-  const shuffled = shuffle(genres);
-  const seedGenres = shuffled.slice(0, 5).join(',');
+const shuffled = shuffle(genres);
+const seedGenres = shuffled.slice(0, 3); // try 1–3 genres max
+let trackUris = [];
 
-  console.log('🎯 Final genre list for Spotify:', shuffled);
-  console.log('✅ Sending to Spotify:', seedGenres);
-
-  if (!seedGenres || seedGenres.split(',').length > 5) {
-    throw new Error('❌ Invalid seedGenres: too many or empty');
-  }
-
-  const recRes = await fetch(`https://api.spotify.com/v1/recommendations?limit=20&seed_genres=${encodeURIComponent(seedGenres)}`, {
+for (const genre of seedGenres) {
+  const searchRes = await fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=7`, {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   });
 
-  let recData;
-  try {
-    recData = await recRes.json();
-  } catch (err) {
-    console.error('Invalid JSON from recommendations API:', err);
-    return {
-      tracks: [],
-      playlistUrl: playlistData.external_urls.spotify
-    };
-  }
+  const searchData = await searchRes.json();
+  const foundTracks = searchData.tracks?.items || [];
 
-  if (!recData.tracks || recData.tracks.length === 0) {
-    console.warn('No tracks returned from Spotify.');
-    return {
-      tracks: [],
-      playlistUrl: playlistData.external_urls.spotify
-    };
-  }
-
-  const trackUris = recData.tracks
+  const uris = foundTracks
     .map(track => track.uri)
     .filter(uri => uri && uri.startsWith('spotify:track:'));
 
-  console.log('🎶 Adding tracks to playlist:', trackUris);
+  trackUris.push(...uris);
+}
+
+// Shuffle & deduplicate
+trackUris = [...new Set(shuffle(trackUris))].slice(0, 20); // Max 100 for Spotify, but 20 here
+
+console.log('🎯 Final genre seeds:', seedGenres);
+console.log('🎶 Final tracks from search:', trackUris);
+
 
   await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
     method: 'POST',
