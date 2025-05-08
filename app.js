@@ -10,19 +10,19 @@ const SCOPES = [
   'user-read-email'
 ];
 
-const temperamentToGenre = {
-  Affectionate: 'chill',
-  Curious: 'indie',
-  Intelligent: 'jazz',
-  Playful: 'pop',
-  Active: 'dance',
-  Lazy: 'ambient',
-  Social: 'funk',
-  Quiet: 'classical',
-  Loyal: 'acoustic',
-  Energetic: 'electronic',
-  Bold: 'rock',
-  Shy: 'lo-fi'
+const temperamentToGenres = {
+  Affectionate: ['chill', 'acoustic'],
+  Curious: ['indie', 'electronic'],
+  Intelligent: ['jazz', 'classical'],
+  Playful: ['pop', 'party'],
+  Active: ['dance', 'edm'],
+  Lazy: ['ambient', 'sleep'],
+  Social: ['funk', 'disco'],
+  Quiet: ['classical', 'sleep'],
+  Loyal: ['acoustic', 'folk'],
+  Energetic: ['electronic', 'rock'],
+  Bold: ['rock', 'punk'],
+  Shy: ['study', 'lo-fi', 'rainy-day'] // lo-fi not valid, so use 'study' + mood genres
 };
 
 let allBreeds = [];
@@ -207,7 +207,9 @@ function getGenresFromSelectedBreeds() {
   selected.forEach(breed => {
     if (breed.temperament) {
       breed.temperament.split(',').map(t => t.trim()).forEach(trait => {
-        if (temperamentToGenre[trait]) traits.add(temperamentToGenre[trait]);
+        if (temperamentToGenres[trait]) {
+            temperamentToGenres[trait].forEach(genre => traits.add(genre));
+        }
       });
     }
   });
