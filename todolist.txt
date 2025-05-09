@@ -1,0 +1,7 @@
+First: Make sure the playlist can't have double of the same song.
+second: Clean up last page and make sure embed works.
+third: remove debugging tools
+forth: Clean up UI in gerenal
+fifth: add animations for loading and what not.
+sixes: add a info tab where users can get some background inside on how the side
+        was made and how anyone can do it themselves
