@@ -1,159 +1,32 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Board Lite Call</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Board Lite Call</title>
 <style>
-:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0f1115;color:#f3f4f6;font-family:Arial,Helvetica,sans-serif}body{overflow:auto}.app{min-height:100%;padding:20px;display:grid;grid-template-rows:auto auto auto;gap:16px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.top h1{margin:0;font-size:30px}.status{font-size:20px;padding:10px 14px;background:#1e232c;border-radius:12px}.videos{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:340px}.videoBox{position:relative;background:#000;border-radius:16px;overflow:hidden;min-height:300px}.videoBox video{width:100%;height:100%;object-fit:cover;background:#000}.tag{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.72);padding:7px 10px;border-radius:9px;font-size:16px}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.pairing{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{background:#171b22;border-radius:16px;padding:14px}.panel h2{margin:0 0 10px;font-size:20px}.panel p{margin:8px 0;color:#b8bec9;font-size:15px;line-height:1.35}button{border:0;border-radius:14px;background:#2b313c;color:#fff;font-size:22px;font-weight:700;min-height:74px;padding:14px;cursor:pointer}button:active{transform:scale(.985)}.primary{background:#4655d8}.good{background:#247c4c}.danger{background:#8c2f2f}.small{min-height:50px;font-size:16px}.active{outline:4px solid #fff}textarea{width:100%;height:116px;resize:vertical;background:#0c0e12;color:#d8dee9;border:1px solid #3a414e;border-radius:10px;padding:10px;font:13px monospace}.row{display:flex;gap:10px;margin-top:10px}.row>*{flex:1}.privacy{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;color:#c8ced8}.privacy input{width:22px;height:22px}.footer{font-size:13px;color:#878e9b}.hide{display:none}@media(max-width:900px){.videos,.pairing{grid-template-columns:1fr}.videos{min-height:0}.videoBox{min-height:240px}.controls{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
-</style>
-</head>
-<body>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0f1115;color:#f4f4f4;font-family:Arial,sans-serif}body{overflow:auto}.app{min-height:100%;padding:20px;display:grid;grid-template-rows:auto 1fr auto auto;gap:14px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px}.top h1{margin:0;font-size:30px}.status{font-size:20px;background:#1e232c;border-radius:12px;padding:10px 14px}.videos{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:330px}.v{position:relative;background:#000;border-radius:16px;overflow:hidden;min-height:300px}.v video{width:100%;height:100%;object-fit:cover}.tag{position:absolute;top:10px;left:10px;background:#000b;padding:7px 10px;border-radius:8px}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}button{border:0;border-radius:14px;background:#2a313b;color:#fff;font-size:22px;font-weight:700;min-height:72px;padding:14px}.primary{background:#4655d8}.good{background:#247c4c}.danger{background:#8c2f2f}.active{outline:4px solid #fff}.join{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{background:#171b22;border-radius:16px;padding:16px}.panel h2{margin:0 0 8px;font-size:21px}.panel p{margin:6px 0 12px;color:#b9c0ca}.code{font-size:64px;font-weight:800;letter-spacing:10px;text-align:center;background:#0b0d11;border-radius:14px;padding:18px;margin:12px 0}.roomInput{width:100%;font-size:44px;letter-spacing:9px;text-align:center;background:#0b0d11;color:#fff;border:1px solid #3b4350;border-radius:14px;padding:14px}.small{font-size:18px;min-height:58px;width:100%;margin-top:10px}.footer{font-size:13px;color:#89919c}@media(max-width:900px){.videos,.join{grid-template-columns:1fr}.videos{min-height:0}.v{min-height:220px}.controls{grid-template-columns:1fr 1fr}.top{flex-direction:column;align-items:flex-start}.code{font-size:52px}}
+</style></head><body>
 <div class="app">
-  <div class="top">
-    <h1>Board Lite Call</h1>
-    <div class="status" id="status">Ready</div>
-  </div>
-
-  <div class="videos">
-    <div class="videoBox"><video id="remote" autoplay playsinline></video><div class="tag">Remote</div></div>
-    <div class="videoBox"><video id="local" autoplay playsinline muted></video><div class="tag">You</div></div>
-  </div>
-
-  <div class="controls">
-    <button class="primary" id="start">Start A/V</button>
-    <button id="mic">Mic: ON</button>
-    <button id="cam">Camera: ON</button>
-    <button class="danger" id="hangup">Hang Up</button>
-  </div>
-
-  <div class="pairing">
-    <div class="panel">
-      <h2>1. Create call</h2>
-      <p>On the first device, start A/V, then create an offer. Copy the code to the second device.</p>
-      <button class="good small" id="makeOffer">Create Offer</button>
-      <textarea id="outCode" readonly placeholder="Your share code appears here"></textarea>
-      <div class="row"><button class="small" id="copyOut">Copy Share Code</button><button class="small" id="selectOut">Select Code</button></div>
-      <label class="privacy"><input type="checkbox" id="stun"> Use Google STUN for different networks</label>
-    </div>
-
-    <div class="panel">
-      <h2>2. Join / finish</h2>
-      <p>Second device: paste the offer and press Create Answer. First device: paste that answer and press Apply Answer.</p>
-      <textarea id="inCode" placeholder="Paste the other device's code here"></textarea>
-      <div class="row"><button class="good small" id="answer">Create Answer</button><button class="primary small" id="applyAnswer">Apply Answer</button></div>
-    </div>
-  </div>
-
-  <div class="footer">No Discord account, token, password, cookies, or call data are stored by this page. Media uses browser WebRTC encryption. Signaling is manual. STUN is optional and off by default.</div>
+<div class="top"><h1>Board Lite Call</h1><div class="status" id="status">Loading signaling…</div></div>
+<div class="videos"><div class="v"><video id="remote" autoplay playsinline></video><div class="tag">Remote</div></div><div class="v"><video id="local" autoplay playsinline muted></video><div class="tag">You</div></div></div>
+<div class="controls"><button class="primary" id="start">Start A/V</button><button id="mic">Mic: ON</button><button id="cam">Camera: ON</button><button class="danger" id="hangup">Hang Up</button></div>
+<div class="join">
+  <div class="panel"><h2>Create room</h2><p>Tap this on the Board. It will show a six-digit code.</p><button class="good small" id="host">Create 6-digit room</button><div class="code" id="myCode">------</div></div>
+  <div class="panel"><h2>Join room</h2><p>On the other device, type the six digits shown on the Board.</p><input id="joinCode" class="roomInput" inputmode="numeric" maxlength="6" placeholder="000000"><button class="primary small" id="join">Join call</button></div>
 </div>
+<div class="footer">No Discord token, login, password or cookies are used or stored. PeerJS Cloud is used only for signaling; WebRTC media is encrypted and sent peer-to-peer when a direct route is available.</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <script>
 'use strict';
-let stream=null, pc=null;
-const $=id=>document.getElementById(id);
-const setStatus=s=>{$('status').textContent=s};
-const enc=obj=>btoa(JSON.stringify(obj));
-const dec=str=>JSON.parse(atob(str.trim()));
-
-async function startAV(){
-  try{
-    setStatus('Requesting camera + mic…');
-    if(stream) stream.getTracks().forEach(t=>t.stop());
-    stream=await navigator.mediaDevices.getUserMedia({
-      audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
-      video:{width:{ideal:640,max:1280},height:{ideal:360,max:720},frameRate:{ideal:15,max:15}}
-    });
-    $('local').srcObject=stream;
-    $('mic').textContent='Mic: ON'; $('cam').textContent='Camera: ON';
-    $('mic').classList.add('active'); $('cam').classList.add('active');
-    setStatus('A/V active');
-  }catch(e){console.error(e);setStatus(e.name+': '+e.message)}
-}
-
-function newPeer(){
-  if(pc) try{pc.close()}catch(e){}
-  const cfg=$('stun').checked?{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}:{iceServers:[]};
-  pc=new RTCPeerConnection(cfg);
-  pc.ontrack=e=>{if(e.streams&&e.streams[0]) $('remote').srcObject=e.streams[0]};
-  pc.onconnectionstatechange=()=>setStatus('Connection: '+pc.connectionState);
-  pc.oniceconnectionstatechange=()=>{if(pc.iceConnectionState==='failed') setStatus('ICE failed — try STUN')};
-  if(stream) stream.getTracks().forEach(t=>pc.addTrack(t,stream));
-  return pc;
-}
-
-function waitIce(p){
-  return new Promise(resolve=>{
-    if(p.iceGatheringState==='complete') return resolve();
-    const f=()=>{if(p.iceGatheringState==='complete'){p.removeEventListener('icegatheringstatechange',f);resolve()}};
-    p.addEventListener('icegatheringstatechange',f);
-    setTimeout(resolve,7000);
-  });
-}
-
-async function makeOffer(){
-  try{
-    if(!stream) await startAV();
-    const p=newPeer();
-    await p.setLocalDescription(await p.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:true}));
-    setStatus('Gathering connection info…');
-    await waitIce(p);
-    $('outCode').value=enc(p.localDescription);
-    setStatus('Offer ready — copy it');
-  }catch(e){console.error(e);setStatus('Offer error: '+e.message)}
-}
-
-async function createAnswer(){
-  try{
-    if(!stream) await startAV();
-    const offer=dec($('inCode').value);
-    const p=newPeer();
-    await p.setRemoteDescription(offer);
-    await p.setLocalDescription(await p.createAnswer());
-    setStatus('Gathering connection info…');
-    await waitIce(p);
-    $('outCode').value=enc(p.localDescription);
-    setStatus('Answer ready — send it back');
-  }catch(e){console.error(e);setStatus('Answer error: '+e.message)}
-}
-
-async function applyAnswer(){
-  try{
-    if(!pc) throw new Error('Create an offer first');
-    await pc.setRemoteDescription(dec($('inCode').value));
-    setStatus('Answer applied — connecting…');
-  }catch(e){console.error(e);setStatus('Apply error: '+e.message)}
-}
-
-function toggle(kind,btn){
-  if(!stream) return;
-  const tracks=kind==='audio'?stream.getAudioTracks():stream.getVideoTracks();
-  if(!tracks.length) return;
-  const next=!tracks[0].enabled;
-  tracks.forEach(t=>t.enabled=next);
-  btn.textContent=(kind==='audio'?'Mic: ':'Camera: ')+(next?'ON':'OFF');
-  btn.classList.toggle('active',next);
-}
-
-function hangup(){
-  if(pc){try{pc.close()}catch(e){} pc=null}
-  $('remote').srcObject=null;
-  setStatus('Call ended');
-}
-
-async function copyOut(){
-  const t=$('outCode');
-  try{await navigator.clipboard.writeText(t.value);setStatus('Code copied')}catch(e){t.focus();t.select();setStatus('Code selected — copy it manually')}
-}
-
-$('start').onclick=startAV;
-$('mic').onclick=()=>toggle('audio',$('mic'));
-$('cam').onclick=()=>toggle('video',$('cam'));
-$('hangup').onclick=hangup;
-$('makeOffer').onclick=makeOffer;
-$('answer').onclick=createAnswer;
-$('applyAnswer').onclick=applyAnswer;
-$('copyOut').onclick=copyOut;
-$('selectOut').onclick=()=>{$('outCode').focus();$('outCode').select();setStatus('Code selected')};
-</script>
-</body>
-</html>
+let stream=null,peer=null,currentCall=null;
+const $=id=>document.getElementById(id),status=s=>$('status').textContent=s;
+const prefix='boardlite-';
+function randomCode(){return String(Math.floor(100000+Math.random()*900000));}
+async function startAV(){try{if(stream)return stream;status('Requesting camera + mic…');stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:{width:{ideal:640,max:1280},height:{ideal:360,max:720},frameRate:{ideal:15,max:15}}});$('local').srcObject=stream;$('mic').classList.add('active');$('cam').classList.add('active');status('A/V active');return stream}catch(e){console.error(e);status(e.name+': '+e.message);throw e}}
+function attachCall(call){if(currentCall)try{currentCall.close()}catch(e){}currentCall=call;call.on('stream',s=>{$('remote').srcObject=s;status('Connected')});call.on('close',()=>{if(currentCall===call){currentCall=null;$('remote').srcObject=null;status('Call ended')}});call.on('error',e=>{console.error(e);status('Call error: '+e.message)})}
+function destroyPeer(){if(peer){try{peer.destroy()}catch(e){}peer=null}}
+async function host(){try{await startAV();destroyPeer();status('Creating room…');let code=randomCode();let tries=0;function build(){peer=new Peer(prefix+code,{debug:0});peer.on('open',()=>{$('myCode').textContent=code;status('Room '+code+' — waiting')});peer.on('call',call=>{attachCall(call);call.answer(stream);status('Incoming call…')});peer.on('error',e=>{if(e.type==='unavailable-id'&&tries<5){tries++;try{peer.destroy()}catch(x){}code=randomCode();build()}else{console.error(e);status('Signaling error: '+e.type)}})}build()}catch(e){}}
+async function join(){try{await startAV();let code=$('joinCode').value.replace(/\D/g,'').slice(0,6);if(code.length!==6){status('Enter all 6 digits');return}destroyPeer();status('Connecting to '+code+'…');peer=new Peer(undefined,{debug:0});peer.on('open',()=>{let call=peer.call(prefix+code,stream);if(!call){status('Could not start call');return}attachCall(call)});peer.on('error',e=>{console.error(e);status(e.type==='peer-unavailable'?'Room not found':'Signaling error: '+e.type)})}catch(e){}}
+function toggle(kind,b){if(!stream)return;let t=kind==='audio'?stream.getAudioTracks():stream.getVideoTracks();if(!t.length)return;let on=!t[0].enabled;t.forEach(x=>x.enabled=on);b.textContent=(kind==='audio'?'Mic: ':'Camera: ')+(on?'ON':'OFF');b.classList.toggle('active',on)}
+function hangup(){if(currentCall)try{currentCall.close()}catch(e){}currentCall=null;$('remote').srcObject=null;status('Call ended')}
+$('start').onclick=startAV;$('host').onclick=host;$('join').onclick=join;$('mic').onclick=()=>toggle('audio',$('mic'));$('cam').onclick=()=>toggle('video',$('cam'));$('hangup').onclick=hangup;$('joinCode').oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,6);
+window.addEventListener('load',()=>status(typeof Peer==='function'?'Ready':'PeerJS failed to load'));
+</script></body></html>
